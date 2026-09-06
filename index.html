@@ -49,7 +49,9 @@
   <div class="err" id="lerr"></div>
   <button id="go">Enter</button>
   <div id="cloudnote" style="font-size:11px;color:#999;margin-top:8px"></div>
-  <div id="prog" style="font-size:12px;margin-top:14px"></div>
+  <div style="margin-top:12px"><button id="refresh" type="button"
+    style="font-size:12px;padding:3px 9px;background:#f6f6f6;color:#333">↻ refresh progress</button></div>
+  <div id="prog" style="font-size:12px;margin-top:8px"></div>
 </div></div>
 
 <div id="app">
@@ -111,7 +113,11 @@ async function annotStats(a){                 // {reads done, features drawn}
     return {reads:s.data().c, feats:s.data().f};
   }catch(e){
     try{ return {reads:(await q.count().get()).data().count, feats:null}; }
-    catch(_){ return {reads:null, feats:null}; }
+    catch(_){
+      try{ const s=await q.get(); let f=0; s.forEach(d=>f+=(d.data().nfeat||0));
+           return {reads:s.size, feats:f}; }
+      catch(__){ return {reads:null, feats:null}; }
+    }
   }
 }
 async function showProgress(){
@@ -122,10 +128,10 @@ async function showProgress(){
   let rows="", tDone=0, tTot=0, tFeat=0;
   for(const a of Object.keys(ASSIGN)){
     const tot=ASSIGN[a].reads, st=await annotStats(a);
-    const done=st.reads==null?0:st.reads, left=Math.max(0,tot-done);
-    const pct=Math.min(100,100*done/tot);
-    tDone+=done; tTot+=tot; tFeat+=(st.feats||0);
-    rows+=`<tr><td>${a}</td><td>${done}</td><td>${left}</td><td>${tot}</td>`
+    const done=st.reads, left=done==null?"?":Math.max(0,tot-done);
+    const pct=done==null?0:Math.min(100,100*done/tot);
+    tDone+=(done||0); tTot+=tot; tFeat+=(st.feats||0);
+    rows+=`<tr><td>${a}</td><td>${done==null?"?":done}</td><td>${left}</td><td>${tot}</td>`
         +`<td>${st.feats==null?"–":st.feats}</td>`
         +`<td style="width:70px"><div class="bar"><i style="width:${pct}%"></i></div></td></tr>`;
   }
@@ -150,6 +156,7 @@ function tryLogin(){
   start();
 }
 document.getElementById("go").onclick=tryLogin;
+document.getElementById("refresh").onclick=showProgress;
 document.getElementById("p").addEventListener("keydown",e=>{if(e.key==="Enter")tryLogin();});
 document.getElementById("logout").onclick=()=>location.reload();
 
