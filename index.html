@@ -55,9 +55,9 @@
 <div id="app">
 <div id="bar">
   <span id="who"></span>
-  <button id="pbatch">◀ batch</button><span id="binfo"></span><button id="nbatch">batch ▶</button>
   <span id="status"></span><span id="counts"></span>
-  <button id="dl">⬇ Download this batch</button>
+  <button id="jumpNext">↧ next unreviewed</button>
+  <button id="dl">⬇ backup my decisions</button>
   <button id="logout">logout</button>
 </div>
 <div id="bar2">
@@ -90,8 +90,8 @@
 
 <script>
 const COL={1:"#1f77b4",2:"#d62728"}, ORI="#2ca02c";
-let ASSIGN=null, ANNOT=null, NBATCHES=0, bi=0;
-let DATA=null, i=0, dec={}, bound=false;
+let ASSIGN=null, ANNOT=null, TOTAL=0, gi=0, curBatch=-1; const SIZE=50;
+let DATA=null, dec={}, bound=false;
 let cur={forks:[],aiIdx:[],orig:[],match:[],origins:[],oriIdx:[],oriEdited:false};
 
 // ---- firebase (optional central storage) ----
@@ -142,13 +142,12 @@ fetch("data/assignments.json").then(r=>r.json()).then(a=>{ASSIGN=a; showProgress
 function tryLogin(){
   const u=document.getElementById("u").value.trim(), p=document.getElementById("p").value.trim();
   if(!ASSIGN||!(u in ASSIGN)){document.getElementById("lerr").textContent="unknown annotator";return;}
-  if(p!==u){document.getElementById("lerr").textContent="password must equal username";return;}
-  ANNOT=u; NBATCHES=ASSIGN[u].batches;
+  if(p!==u){document.getElementById("lerr").textContent="incorrect password";return;}
+  ANNOT=u; TOTAL=ASSIGN[u].reads;
   document.getElementById("login").style.display="none";
   document.getElementById("app").style.display="block";
-  document.getElementById("who").textContent=`${ANNOT} · ${ASSIGN[u].reads} reads`;
-  bi=parseInt(localStorage.getItem(`bi_${ANNOT}`)||"0");
-  loadBatch(Math.min(bi,NBATCHES-1));
+  document.getElementById("who").textContent=`${ANNOT} · ${TOTAL} reads`;
+  start();
 }
 document.getElementById("go").onclick=tryLogin;
 document.getElementById("p").addEventListener("keydown",e=>{if(e.key==="Enter")tryLogin();});
@@ -156,36 +155,53 @@ document.getElementById("logout").onclick=()=>location.reload();
 
 // ---- batch load / persistence ----
 const pad=n=>String(n).padStart(3,"0");
-const decKey=()=>`dec_${ANNOT}_${bi}`;
-function saveLocal(){localStorage.setItem(decKey(),JSON.stringify(dec));}
+function saveLocal(){localStorage.setItem(`dec_${ANNOT}`,JSON.stringify(dec));}
 function saveDecision(rid){
   saveLocal();
   if(!db) return;
   const v=dec[rid];
   const nfeat=(v.forks?v.forks.length:0)+((v.ori_edited&&v.origins)?v.origins.length:0);
   db.collection("decisions").doc(`${ANNOT}__${rid}`)
-    .set({...v,batchKey:`${ANNOT}_${bi}`,batch:bi,nfeat,ts:Date.now()})
+    .set({...v,batchKey:`${ANNOT}_${curBatch}`,batch:curBatch,nfeat,ts:Date.now()})
     .catch(e=>console.warn("cloud save failed",e));
 }
-function loadBatch(n){
-  bi=Math.max(0,Math.min(n,NBATCHES-1));
-  localStorage.setItem(`bi_${ANNOT}`,bi);
-  fetch(`data/${ANNOT}/batch_${pad(bi)}.json`).then(r=>r.json()).then(async d=>{
-    DATA=d; i=0; dec={};
-    if(db){
-      try{ const snap=await db.collection("decisions").where("batchKey","==",`${ANNOT}_${bi}`).get();
-           snap.forEach(doc=>{const v=doc.data(); dec[v.read_id]=v;}); }
-      catch(e){ console.warn("cloud load failed",e); }
-    }
-    if(!Object.keys(dec).length){ try{dec=JSON.parse(localStorage.getItem(decKey()))||{};}catch(e){dec={};} }
-    render();
-  });
+// load the batch file that contains global read index gi (transparent to the user)
+async function ensureBatch(b){
+  if(b===curBatch && DATA) return;
+  DATA=await (await fetch(`data/${ANNOT}/batch_${pad(b)}.json`)).json(); curBatch=b;
+  if(db){
+    try{ const snap=await db.collection("decisions").where("batchKey","==",`${ANNOT}_${b}`).get();
+         snap.forEach(doc=>{const v=doc.data(); dec[v.read_id]=v;}); }
+    catch(e){ console.warn("cloud load failed",e); }
+  }else{
+    try{ Object.assign(dec, JSON.parse(localStorage.getItem(`dec_${ANNOT}`))||{}); }catch(e){}
+  }
 }
-document.getElementById("pbatch").onclick=()=>loadBatch(bi-1);
-document.getElementById("nbatch").onclick=()=>loadBatch(bi+1);
+async function goto(g){
+  gi=Math.max(0,Math.min(g,TOTAL-1));
+  localStorage.setItem(`gi_${ANNOT}`,gi);
+  await ensureBatch(Math.floor(gi/SIZE));
+  render();
+}
+async function start(){
+  dec={};
+  let resume=parseInt(localStorage.getItem(`gi_${ANNOT}`)||"0");
+  if(db){ try{ const s=await annotStats(ANNOT); if(s.reads!=null) resume=Math.min(s.reads,TOTAL-1); }catch(e){} }
+  await goto(resume);
+}
+// skip forward to the first read with no decision yet
+async function jumpNext(){
+  let g=gi;
+  while(g<TOTAL-1){
+    g++; await ensureBatch(Math.floor(g/SIZE));
+    if(!dec[DATA.reads[g-curBatch*SIZE].read_id]){ await goto(g); return; }
+  }
+  await goto(g);
+}
+document.getElementById("jumpNext").onclick=jumpNext;
 
 // ---- drawing ----
-const read=()=>DATA.reads[i];
+const read=()=>DATA.reads[gi-curBatch*SIZE];
 const kb=bp=>bp/1000;
 const clsOf=k=>k==="left_fork"?1:2;
 function band(shapes,x0,x1,col,editable,dash){
@@ -293,15 +309,14 @@ function decide(kind){
 function updateStatus(){
   const r=read(),d=dec[r.read_id];
   const cl=d?({accept:"a",modify:"m",reject:"r"})[d.decision]:"p";
-  document.getElementById("binfo").textContent=` batch ${bi+1}/${NBATCHES} `;
   document.getElementById("status").innerHTML=
-    `· read ${i+1}/${DATA.reads.length} <span class="tag ${cl}">${d?d.decision:"pending"}</span>`;
+    `read ${gi+1}/${TOTAL} <span class="tag ${cl}">${d?d.decision:"pending"}</span>`;
   const c=k=>Object.values(dec).filter(x=>x.decision===k).length;
   document.getElementById("counts").textContent=
-    `✓${c("accept")} ✎${c("modify")} ✗${c("reject")} · ${Object.keys(dec).length}/${DATA.reads.length} done`;
+    `· ✓${c("accept")} ✎${c("modify")} ✗${c("reject")} this session`;
 }
-function next(){i<DATA.reads.length-1?(i++,render()):updateStatus();}
-function prev(){if(i>0){i--;render();}}
+async function next(){ if(gi<TOTAL-1) await goto(gi+1); else updateStatus(); }
+async function prev(){ if(gi>0) await goto(gi-1); }
 
 accept.onclick=()=>decide("accept");modify.onclick=()=>decide("modify");reject.onclick=()=>decide("reject");
 newLF.onclick=()=>newFork(1);newRF.onclick=()=>newFork(2);newORI.onclick=newOri;rmLast.onclick=rmLast;
@@ -310,11 +325,11 @@ document.onkeydown=e=>{if(document.getElementById("login").style.display==="none
   const k=e.key;
   if(k==="a")decide("accept");else if(k==="m")decide("modify");else if(k==="r")decide("reject");
   else if(k==="ArrowRight")next();else if(k==="ArrowLeft")prev();}};
-dl.onclick=()=>{
-  const out={batch:bi,annotator:ANNOT,
+dl.onclick=()=>{                       // backup: all decisions loaded this session
+  const out={annotator:ANNOT,
     decisions:Object.entries(dec).map(([read_id,v])=>({read_id,...v}))};
   const b=new Blob([JSON.stringify(out,null,1)],{type:"application/json"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);a.download=`decisions_${ANNOT}_batch_${bi}.json`;a.click();
+  a.href=URL.createObjectURL(b);a.download=`decisions_${ANNOT}.json`;a.click();
 };
 </script>
