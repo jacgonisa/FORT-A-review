@@ -1,0 +1,1007 @@
+{
+ "batch": 0,
+ "decisions": [
+  {
+   "read_id": "14849f53-cad9-4da6-b3f7-533d7edcbcaa",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 14967566,
+     "end": 14982111,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 14964157,
+     "end": 14965603
+    }
+   ]
+  },
+  {
+   "read_id": "1487e715-7231-41ea-966b-f336ce641640",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 29350252,
+     "end": 29367252,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "14fe7ceb-88c5-4718-b754-469af970d99e",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 10684047,
+     "end": 10700047,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "15266894-b5a3-460e-bfe8-209753a3420f",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 14764089,
+     "end": 14802839,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "15a42ca2-63cf-4502-99e3-3e2421de3031",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 19683690,
+     "end": 19688690,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "16c518c6-f5cd-43c7-bba7-c635d6f68187",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 26293064,
+     "end": 26302589,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 26341063,
+     "end": 26352339,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 26360089,
+     "end": 26375839,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 26352515,
+     "end": 26357515
+    }
+   ]
+  },
+  {
+   "read_id": "16f4c948-9db7-47ee-a1e1-92df6140c4a5",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 17473959,
+     "end": 17491959,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 17519209,
+     "end": 17530214,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 17465709,
+     "end": 17473459,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 17502959,
+     "end": 17513612,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 17512459,
+     "end": 17518959,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 17534709,
+     "end": 17545944,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 17544913,
+     "end": 17549914
+    },
+    {
+     "cls": 2,
+     "start": 17551388,
+     "end": 17565617
+    }
+   ]
+  },
+  {
+   "read_id": "177528f9-69b4-45ac-8e8f-65e192c39ded",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 7603245,
+     "end": 7616495,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "180567e8-0aae-4c9d-9885-4eecd760e49d",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 27408442,
+     "end": 27433942,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "183816fb-d17c-44b9-b798-799768af3d4f",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 12738146,
+     "end": 12751097,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 12683895,
+     "end": 12689645,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 12677013,
+     "end": 12682014
+    }
+   ]
+  },
+  {
+   "read_id": "19699f73-b792-4ebb-831b-14aa332a0117",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 20544552,
+     "end": 20571552,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "19b1986b-9624-4bc3-b673-ec5ec8b8c319",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 11888477,
+     "end": 11898552,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 11861250,
+     "end": 11878333
+    },
+    {
+     "cls": 1,
+     "start": 11898720,
+     "end": 11903719
+    },
+    {
+     "cls": 2,
+     "start": 11907884,
+     "end": 11914749
+    },
+    {
+     "cls": 1,
+     "start": 11914616,
+     "end": 11923103
+    }
+   ]
+  },
+  {
+   "read_id": "19d63be0-a4d3-4eb1-9f85-63f59bf755ae",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 30398369,
+     "end": 30410869,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "1a09d3e1-e5e9-4b33-ab13-7db28c3e6fac",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 21786689,
+     "end": 21791439,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "1a84b59b-5564-473b-8110-da256ab0c54b",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 11357067,
+     "end": 11363131,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "1b00fdc1-bd97-4c36-993f-457df25529c2",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 25830174,
+     "end": 25855174,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "1b14b45b-f848-4c82-bbcf-928d0d031df3",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 18092142,
+     "end": 18108414,
+     "orphan": true
+    },
+    {
+     "cls": 2,
+     "start": 18122211,
+     "end": 18129142
+    },
+    {
+     "cls": 1,
+     "start": 18129117,
+     "end": 18145881
+    },
+    {
+     "cls": 2,
+     "start": 18157211,
+     "end": 18162210
+    }
+   ]
+  },
+  {
+   "read_id": "1b38f0a5-8e8c-47f8-97e5-7449765f7dbb",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 14234653,
+     "end": 14244704,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 14245899,
+     "end": 14250899
+    }
+   ]
+  },
+  {
+   "read_id": "1b5b02c6-457c-48ef-9c2c-9227d9e81f7c",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 2038029,
+     "end": 2041529,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 2016493,
+     "end": 2028246
+    }
+   ]
+  },
+  {
+   "read_id": "1c1cdddc-e149-4717-99a7-b08f84e09b79",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 10149091,
+     "end": 10168841,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "1d8ff8ba-531c-4874-b286-a090cf476f09",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 6291104,
+     "end": 6302348,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 6284354,
+     "end": 6288854,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 6304553,
+     "end": 6317853
+    },
+    {
+     "cls": 1,
+     "start": 6318286,
+     "end": 6329700
+    },
+    {
+     "cls": 2,
+     "start": 6332397,
+     "end": 6339737
+    }
+   ]
+  },
+  {
+   "read_id": "1e040bbc-22c5-41e2-b956-f69f983d3c21",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 23625086,
+     "end": 23645836,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 23650348,
+     "end": 23658086,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "1e2fb14b-1717-4ce9-9316-e506f1275100",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 8806501,
+     "end": 8824501,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 8826401,
+     "end": 8838410
+    }
+   ]
+  },
+  {
+   "read_id": "1efe3d19-862e-4179-a9f7-25faa94d93b3",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 31330827,
+     "end": 31344017,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 31239567,
+     "end": 31263440
+    },
+    {
+     "cls": 2,
+     "start": 31320903,
+     "end": 31330914
+    }
+   ]
+  },
+  {
+   "read_id": "204c9007-1c9e-4b9a-80e6-b77ee5a15eb5",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 23191818,
+     "end": 23198408,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 23099158,
+     "end": 23107288,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 23105908,
+     "end": 23131158,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 23200565,
+     "end": 23214158,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 23163093,
+     "end": 23174198
+    },
+    {
+     "cls": 1,
+     "start": 23144895,
+     "end": 23161989
+    }
+   ]
+  },
+  {
+   "read_id": "20b221b4-940b-4b5a-9a99-0ab809c34924",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 15612178,
+     "end": 15624410,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 15587723,
+     "end": 15597234
+    },
+    {
+     "cls": 1,
+     "start": 15631332,
+     "end": 15649934
+    }
+   ]
+  },
+  {
+   "read_id": "20b618a1-53b9-4cad-bfb1-cf11772bbf73",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 11383445,
+     "end": 11402130,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 11351868,
+     "end": 11361015
+    }
+   ]
+  },
+  {
+   "read_id": "20dd9a18-ff9f-46c2-b9e1-a358d1a0c7e9",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 10818656,
+     "end": 10836363,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "21171580-21b1-4046-9ff9-db7d4aa4f538",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 20491331,
+     "end": 20510128,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "21fa78ab-36df-4963-b968-bbc5b68602de",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 22041498,
+     "end": 22049087,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 21968521,
+     "end": 21982771,
+     "orphan": true
+    },
+    {
+     "cls": 2,
+     "start": 22052521,
+     "end": 22073771,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 22021993,
+     "end": 22040972
+    }
+   ]
+  },
+  {
+   "read_id": "222f44a9-1cc9-4821-a143-2ad6660b19ce",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 14972509,
+     "end": 14985509,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 14945531,
+     "end": 14962630
+    },
+    {
+     "cls": 1,
+     "start": 15026472,
+     "end": 15033767
+    }
+   ]
+  },
+  {
+   "read_id": "22940a48-8f68-4326-ab86-83e00bff30ff",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 15456255,
+     "end": 15487799,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 15499505,
+     "end": 15504255,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 15407452,
+     "end": 15450130
+    }
+   ]
+  },
+  {
+   "read_id": "22d7facc-21fb-46c2-8cf8-350414bea70c",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 943470,
+     "end": 953970,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "23039182-af11-4fbb-854f-a4d1e3594fa8",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 2994730,
+     "end": 3007058,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "24d75bb5-24a0-4f8d-acd9-84e1a9ad4cde",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 4512210,
+     "end": 4528710,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 4466124,
+     "end": 4476684
+    }
+   ]
+  },
+  {
+   "read_id": "25e0e2c6-59aa-435a-b26e-4fd6dc9dadc3",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 14633737,
+     "end": 14658859,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 14659350,
+     "end": 14665262
+    },
+    {
+     "cls": 2,
+     "start": 14666751,
+     "end": 14671751
+    }
+   ]
+  },
+  {
+   "read_id": "26208c62-1e3a-45e0-b5c0-002ee5fef6e4",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 10652934,
+     "end": 10690684,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 10730723,
+     "end": 10754934,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 10641988,
+     "end": 10651325
+    }
+   ]
+  },
+  {
+   "read_id": "2627fb93-c1eb-4955-a411-ce0b2599cad7",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 980866,
+     "end": 987366,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 959028,
+     "end": 968944
+    },
+    {
+     "cls": 1,
+     "start": 969447,
+     "end": 975617
+    }
+   ]
+  },
+  {
+   "read_id": "262870fb-a6c6-4112-8383-393144a6df81",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 21618715,
+     "end": 21627465,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 21610049,
+     "end": 21613899
+    },
+    {
+     "cls": 2,
+     "start": 21614166,
+     "end": 21619165
+    },
+    {
+     "cls": 2,
+     "start": 21603635,
+     "end": 21608634
+    },
+    {
+     "cls": 1,
+     "start": 21622207,
+     "end": 21627207
+    },
+    {
+     "cls": 1,
+     "start": 21596359,
+     "end": 21601358
+    }
+   ]
+  },
+  {
+   "read_id": "2652152e-70b1-4359-b00b-42e688b53ccc",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 21402070,
+     "end": 21413320,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "26af6b24-7ab5-4311-b474-1f63356886fe",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 20347649,
+     "end": 20370649,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "2719592d-aa04-4c40-a4eb-08f5f14dafcc",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 17880846,
+     "end": 17895254,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 17867090,
+     "end": 17879505
+    }
+   ]
+  },
+  {
+   "read_id": "29eb002e-51be-4a85-a5fb-d98e5bb24c1f",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 1550507,
+     "end": 1564197,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 1564317,
+     "end": 1571029
+    },
+    {
+     "cls": 2,
+     "start": 1589116,
+     "end": 1596855
+    }
+   ]
+  },
+  {
+   "read_id": "2c32d98f-ff30-4d08-a776-f5b4fbc56bcd",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 7896113,
+     "end": 7900863,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 7901577,
+     "end": 7909087
+    },
+    {
+     "cls": 2,
+     "start": 7909873,
+     "end": 7916359
+    },
+    {
+     "cls": 2,
+     "start": 7939218,
+     "end": 7944218
+    },
+    {
+     "cls": 1,
+     "start": 7933482,
+     "end": 7937970
+    }
+   ]
+  },
+  {
+   "read_id": "2c920d9b-a7eb-40d4-b75e-c53fa17e0f0f",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 11360185,
+     "end": 11370935,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 11303435,
+     "end": 11315935,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 11330301,
+     "end": 11339490
+    }
+   ]
+  },
+  {
+   "read_id": "2d44bd3a-31f4-4662-8c4e-a1acf7a9bed9",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 13401596,
+     "end": 13409930,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 13338346,
+     "end": 13358346,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 13304578,
+     "end": 13316779
+    },
+    {
+     "cls": 2,
+     "start": 13388637,
+     "end": 13400962
+    },
+    {
+     "cls": 1,
+     "start": 13436689,
+     "end": 13450876
+    },
+    {
+     "cls": 2,
+     "start": 13424520,
+     "end": 13436721
+    }
+   ]
+  },
+  {
+   "read_id": "2d8ba3cc-8f53-4d02-92f6-d0c3bd3e571b",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 19134300,
+     "end": 19149050,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "2db03e27-d7ec-4750-8821-ec37d876acc9",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 717452,
+     "end": 722702,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "2de74618-eec3-4991-835a-dd7ecf71eba0",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 1089751,
+     "end": 1107751,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 1135501,
+     "end": 1147251,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 1051184,
+     "end": 1085868
+    }
+   ]
+  },
+  {
+   "read_id": "2f8e147f-5464-44e9-b6bd-285496363efd",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 3539076,
+     "end": 3541313,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 3543326,
+     "end": 3555030,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 3552076,
+     "end": 3554826,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 3529835,
+     "end": 3537498
+    }
+   ]
+  }
+ ]
+}

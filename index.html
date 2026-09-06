@@ -1,0 +1,320 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>FORT-A fork review</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="config.js" onerror="window.__noconfig=1"></script>
+<style>
+  body{font:14px/1.4 system-ui,sans-serif;margin:0;padding:8px 16px;color:#222}
+  #login{position:fixed;inset:0;background:#f4f4f4;display:flex;align-items:center;
+    justify-content:center;z-index:10}
+  #login .box{background:#fff;padding:28px 32px;border:1px solid #ccc;border-radius:10px;
+    box-shadow:0 4px 18px #0002;min-width:280px}
+  #login h2{margin:0 0 4px}#login p{color:#666;margin:0 0 16px;font-size:13px}
+  #login input{display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:8px;
+    border:1px solid #bbb;border-radius:6px;font-size:14px}
+  #login button{width:100%;margin-top:10px;padding:9px;font-size:14px;background:#1a6e1a;
+    color:#fff;border:none;border-radius:6px;cursor:pointer}
+  #login .err{color:#c00;font-size:12px;min-height:16px}
+  #prog table{border-collapse:collapse;width:100%}
+  #prog th,#prog td{border:1px solid #e0e0e0;padding:3px 8px;text-align:right}
+  #prog th:first-child,#prog td:first-child{text-align:left}
+  #prog .bar{height:5px;background:#e5e5e5;border-radius:3px;overflow:hidden}
+  #prog .bar>i{display:block;height:100%;background:#2ca02c}
+  #app{display:none}
+  #bar,#bar2{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:5px}
+  button{font:13px system-ui;padding:5px 10px;border:1px solid #bbb;border-radius:6px;
+    background:#f6f6f6;cursor:pointer}
+  button:hover{background:#eee}
+  #accept{border-color:#2ca02c;color:#1a6e1a}#modify{border-color:#b8860b;color:#8a6400}
+  #reject{border-color:#d62728;color:#a11}
+  #newLF{border-color:#1f77b4;color:#1f77b4}#newRF{border-color:#d62728;color:#d62728}
+  #newORI{border-color:#2ca02c;color:#1a6e1a}
+  #dl{margin-left:auto;border-color:#333}#logout{border-color:#999;color:#666}
+  .tag{padding:2px 8px;border-radius:10px;font-size:12px}
+  .a{background:#d9f2d9}.m{background:#faf0d0}.r{background:#f7d9d9}.p{background:#eee}
+  #status,#who{font-weight:600}
+  #legend{font-size:12px;color:#444;margin:2px 0 4px;display:flex;gap:14px;flex-wrap:wrap}
+  #legend span{display:inline-flex;align-items:center;gap:5px}
+  .sw{display:inline-block;width:22px;height:0;border-top-width:3px;border-top-style:solid}
+  .box2{display:inline-block;width:13px;height:11px;opacity:.4;border-radius:2px}
+</style>
+
+<div id="login"><div class="box">
+  <h2>FORT-A review</h2>
+  <p>Enter the username and password you were given.</p>
+  <input id="u" placeholder="username" autocomplete="off">
+  <input id="p" type="password" placeholder="password" autocomplete="off">
+  <div class="err" id="lerr"></div>
+  <button id="go">Enter</button>
+  <div id="cloudnote" style="font-size:11px;color:#999;margin-top:8px"></div>
+  <div id="prog" style="font-size:12px;margin-top:14px"></div>
+</div></div>
+
+<div id="app">
+<div id="bar">
+  <span id="who"></span>
+  <button id="pbatch">◀ batch</button><span id="binfo"></span><button id="nbatch">batch ▶</button>
+  <span id="status"></span><span id="counts"></span>
+  <button id="dl">⬇ Download this batch</button>
+  <button id="logout">logout</button>
+</div>
+<div id="bar2">
+  <button id="prev">◀ Prev read</button>
+  <button id="reject">Reject (r)</button>
+  <button id="modify">✎ Modify &amp; accept (m)</button>
+  <button id="accept">Accept as-is (a)</button>
+  <button id="next">Next read ▶</button>
+  <span style="color:#888;font-size:12px">| add:</span>
+  <button id="newLF">＋LF</button><button id="newRF">＋RF</button>
+  <button id="newORI">＋origin</button><button id="rmLast">－remove last fork</button>
+</div>
+<div id="feats" style="font-size:12px;margin:2px 0"></div>
+<div id="legend">
+  <span><b>top human:</b></span>
+  <span><span class="box2" style="background:#2ca02c"></span>origin</span>
+  <span><span class="sw" style="border-top-color:#1f77b4"></span>
+        <span class="sw" style="border-top-color:#d62728"></span>fork</span>
+  <span><b>bottom (edit):</b></span>
+  <span><span class="box2" style="background:#2ca02c;border:1.5px solid #1a6e1a"></span>origin (drag/＋)</span>
+  <span><span class="sw" style="border-top-color:#1f77b4;border-top-style:dotted"></span>
+        <span class="sw" style="border-top-color:#d62728;border-top-style:dotted"></span>AI proposal</span>
+  <span><span class="sw" style="border-top-color:#1f77b4;border-top-style:solid"></span>AI agrees (view)</span>
+  <span><span class="sw" style="border-top-color:#555;border-top-style:dashed"></span>orphan</span>
+</div>
+<div id="plotH" style="width:100%;height:22vh"></div>
+<div id="plotA" style="width:100%;height:30vh"></div>
+<div id="plotP" style="width:100%;height:20vh"></div>
+</div>
+
+<script>
+const COL={1:"#1f77b4",2:"#d62728"}, ORI="#2ca02c";
+let ASSIGN=null, ANNOT=null, NBATCHES=0, bi=0;
+let DATA=null, i=0, dec={}, bound=false;
+let cur={forks:[],aiIdx:[],orig:[],match:[],origins:[],oriIdx:[],oriEdited:false};
+
+// ---- firebase (optional central storage) ----
+let db=null, CLOUD=false;
+try{ if(window.firebaseConfig && window.firebase){
+  firebase.initializeApp(window.firebaseConfig); db=firebase.firestore(); CLOUD=true;
+}}catch(e){ console.warn("firebase init failed", e); }
+document.getElementById("cloudnote").textContent =
+  CLOUD ? "☁ cloud storage on — your work saves automatically"
+        : "⚠ local-only (no cloud config) — use ⬇ Download to submit";
+
+async function annotStats(a){                 // {reads done, features drawn}
+  const q=db.collection("decisions").where("annotator","==",a);
+  try{
+    const AF=firebase.firestore.AggregateField;
+    const s=await q.aggregate({c:AF.count(),f:AF.sum("nfeat")}).get();
+    return {reads:s.data().c, feats:s.data().f};
+  }catch(e){
+    try{ return {reads:(await q.count().get()).data().count, feats:null}; }
+    catch(_){ return {reads:null, feats:null}; }
+  }
+}
+async function showProgress(){
+  const box=document.getElementById("prog");
+  if(!ASSIGN){ box.textContent=""; return; }
+  if(!CLOUD){ box.innerHTML="<i style='color:#999'>progress shown once cloud is configured</i>"; return; }
+  box.innerHTML="<i style='color:#999'>loading progress…</i>";
+  let rows="", tDone=0, tTot=0, tFeat=0;
+  for(const a of Object.keys(ASSIGN)){
+    const tot=ASSIGN[a].reads, st=await annotStats(a);
+    const done=st.reads==null?0:st.reads, left=Math.max(0,tot-done);
+    const pct=Math.min(100,100*done/tot);
+    tDone+=done; tTot+=tot; tFeat+=(st.feats||0);
+    rows+=`<tr><td>${a}</td><td>${done}</td><td>${left}</td><td>${tot}</td>`
+        +`<td>${st.feats==null?"–":st.feats}</td>`
+        +`<td style="width:70px"><div class="bar"><i style="width:${pct}%"></i></div></td></tr>`;
+  }
+  rows+=`<tr style="font-weight:600"><td>all</td><td>${tDone}</td><td>${tTot-tDone}</td>`
+      +`<td>${tTot}</td><td>${tFeat||"–"}</td>`
+      +`<td><div class="bar"><i style="width:${Math.min(100,100*tDone/tTot)}%"></i></div></td></tr>`;
+  box.innerHTML=`<table><tr><th>annotator</th><th>done</th><th>left</th><th>total</th>`
+      +`<th>features</th><th></th></tr>${rows}</table>`;
+}
+
+// ---- login ----
+fetch("data/assignments.json").then(r=>r.json()).then(a=>{ASSIGN=a; showProgress();})
+  .catch(()=>document.getElementById("lerr").textContent="assignments.json not found");
+function tryLogin(){
+  const u=document.getElementById("u").value.trim(), p=document.getElementById("p").value.trim();
+  if(!ASSIGN||!(u in ASSIGN)){document.getElementById("lerr").textContent="unknown annotator";return;}
+  if(p!==u){document.getElementById("lerr").textContent="password must equal username";return;}
+  ANNOT=u; NBATCHES=ASSIGN[u].batches;
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+  document.getElementById("who").textContent=`${ANNOT} · ${ASSIGN[u].reads} reads`;
+  bi=parseInt(localStorage.getItem(`bi_${ANNOT}`)||"0");
+  loadBatch(Math.min(bi,NBATCHES-1));
+}
+document.getElementById("go").onclick=tryLogin;
+document.getElementById("p").addEventListener("keydown",e=>{if(e.key==="Enter")tryLogin();});
+document.getElementById("logout").onclick=()=>location.reload();
+
+// ---- batch load / persistence ----
+const pad=n=>String(n).padStart(3,"0");
+const decKey=()=>`dec_${ANNOT}_${bi}`;
+function saveLocal(){localStorage.setItem(decKey(),JSON.stringify(dec));}
+function saveDecision(rid){
+  saveLocal();
+  if(!db) return;
+  const v=dec[rid];
+  const nfeat=(v.forks?v.forks.length:0)+((v.ori_edited&&v.origins)?v.origins.length:0);
+  db.collection("decisions").doc(`${ANNOT}__${rid}`)
+    .set({...v,batchKey:`${ANNOT}_${bi}`,batch:bi,nfeat,ts:Date.now()})
+    .catch(e=>console.warn("cloud save failed",e));
+}
+function loadBatch(n){
+  bi=Math.max(0,Math.min(n,NBATCHES-1));
+  localStorage.setItem(`bi_${ANNOT}`,bi);
+  fetch(`data/${ANNOT}/batch_${pad(bi)}.json`).then(r=>r.json()).then(async d=>{
+    DATA=d; i=0; dec={};
+    if(db){
+      try{ const snap=await db.collection("decisions").where("batchKey","==",`${ANNOT}_${bi}`).get();
+           snap.forEach(doc=>{const v=doc.data(); dec[v.read_id]=v;}); }
+      catch(e){ console.warn("cloud load failed",e); }
+    }
+    if(!Object.keys(dec).length){ try{dec=JSON.parse(localStorage.getItem(decKey()))||{};}catch(e){dec={};} }
+    render();
+  });
+}
+document.getElementById("pbatch").onclick=()=>loadBatch(bi-1);
+document.getElementById("nbatch").onclick=()=>loadBatch(bi+1);
+
+// ---- drawing ----
+const read=()=>DATA.reads[i];
+const kb=bp=>bp/1000;
+const clsOf=k=>k==="left_fork"?1:2;
+function band(shapes,x0,x1,col,editable,dash){
+  const lw=editable?2:(dash?1.5:0);
+  shapes.push({type:"rect",xref:"x",yref:"paper",x0:kb(x0),x1:kb(x1),y0:0,y1:1,
+    fillcolor:col,opacity:0.17,line:{width:lw,color:col,dash:dash||"solid"}});
+}
+const sigTrace=r=>({x:r.x,y:r.signal,mode:"lines",line:{color:"#000",width:1,shape:"hv"}});
+let xr=[0,1], ymax=1;
+
+function renderHuman(){
+  const r=read(),hs=[];
+  r.origins.forEach(o=>band(hs,o.start,o.end,ORI,false));
+  r.human_forks.forEach(f=>band(hs,f.start,f.end,COL[clsOf(f.kind)],false));
+  Plotly.react("plotH",[sigTrace(r)],{margin:{t:20,r:8,b:8,l:44},
+    yaxis:{range:[0,ymax],title:"BrdU"},xaxis:{range:xr,showticklabels:false},shapes:hs,
+    showlegend:false,title:{text:`HUMAN — ${r.origins.length} ori / ${r.human_forks.length} fork`,
+      font:{size:12},x:0.01,xanchor:"left"}},{staticPlot:true,displayModeBar:false});
+}
+function renderAI(){
+  const r=read(),as=[]; cur.aiIdx=[]; cur.oriIdx=[];
+  cur.origins.forEach(o=>{cur.oriIdx.push(as.length);band(as,o.start,o.end,ORI,true,"solid");});
+  (cur.match||[]).forEach(f=>band(as,f.start,f.end,COL[f.cls],false,"solid"));
+  cur.forks.forEach(f=>{cur.aiIdx.push(as.length);
+    band(as,f.start,f.end,COL[f.cls],true,f.orphan?"dashdot":"dot");});
+  Plotly.react("plotA",[sigTrace(r)],{margin:{t:20,r:8,b:8,l:44},
+    yaxis:{range:[0,ymax],title:"BrdU"},xaxis:{range:xr,showticklabels:false},shapes:as,
+    showlegend:false,title:{text:`EDIT — origins (green) + forks · proposals ${cur.forks.length}`,
+      font:{size:12},x:0.01,xanchor:"left"}},
+    {editable:false,edits:{shapePosition:true},displayModeBar:false});
+  if(!bound){bound=true;
+    document.getElementById("plotA").on("plotly_relayout",ev=>{
+      cur.oriIdx.forEach((s,k)=>{
+        const x0=ev[`shapes[${s}].x0`],x1=ev[`shapes[${s}].x1`];
+        if(x0!==undefined){cur.origins[k].start=Math.round(Math.min(x0,x1)*1000);cur.oriEdited=true;}
+        if(x1!==undefined){cur.origins[k].end  =Math.round(Math.max(x0,x1)*1000);cur.oriEdited=true;}
+      });
+      cur.aiIdx.forEach((s,k)=>{
+        const x0=ev[`shapes[${s}].x0`],x1=ev[`shapes[${s}].x1`];
+        if(x0!==undefined)cur.forks[k].start=Math.round(Math.min(x0,x1)*1000);
+        if(x1!==undefined)cur.forks[k].end  =Math.round(Math.max(x0,x1)*1000);
+      });
+      renderChips();
+    });
+  }
+}
+function renderProb(){
+  const r=read();
+  const mk=(y,c,n)=>({x:r.x,y,mode:"lines",line:{color:c,width:1.3,shape:"hv"},name:n});
+  Plotly.react("plotP",[mk(r.prob_lf,COL[1],"P(LF)"),mk(r.prob_rf,COL[2],"P(RF)"),
+    mk(r.prob_ori,ORI,"P(ORI)")],
+    {margin:{t:18,r:8,b:34,l:44},yaxis:{range:[0,1],title:"softmax"},
+     xaxis:{range:xr,title:`${r.chrom} (kb)`},
+     shapes:[{type:"line",xref:"paper",yref:"y",x0:0,x1:1,y0:0.3,y1:0.3,line:{color:"#999",width:1,dash:"dot"}}],
+     legend:{orientation:"h",x:0,y:1.3},showlegend:true},{staticPlot:true,displayModeBar:false});
+}
+function renderChips(){
+  const el=document.getElementById("feats"); el.innerHTML="remove: ";
+  const mk=(text,col,onDel)=>{
+    const s=document.createElement("span");
+    s.style.cssText=`display:inline-flex;align-items:center;gap:4px;border:1px solid ${col};`
+      +`border-radius:10px;padding:1px 7px;margin:2px`;
+    s.textContent=text;
+    const x=document.createElement("b"); x.textContent="✕";
+    x.style.cssText="cursor:pointer;color:#c00"; x.onclick=onDel;
+    s.appendChild(x); el.appendChild(s);
+  };
+  cur.origins.forEach((o,k)=>mk(`ORI ${(o.start/1000).toFixed(1)}–${(o.end/1000).toFixed(1)}`,ORI,
+    ()=>{cur.origins.splice(k,1);cur.oriEdited=true;renderAI();renderChips();}));
+  cur.forks.forEach((f,k)=>mk(`${f.cls===1?"LF":"RF"} ${(f.start/1000).toFixed(1)}–${(f.end/1000).toFixed(1)}`,
+    COL[f.cls],()=>{cur.forks.splice(k,1);renderAI();renderChips();}));
+  if(!cur.origins.length&&!cur.forks.length) el.innerHTML+="<i style='color:#999'>(none)</i>";
+}
+function render(){
+  const r=read();
+  xr=[Math.min(...r.x),Math.max(...r.x)]; ymax=Math.max(1,...r.signal)*1.1;
+  const d=dec[r.read_id];
+  const aiNew=r.ai_forks.filter(f=>f.new!==false);
+  cur.match=r.ai_forks.filter(f=>f.new===false).map(f=>({cls:f.cls,start:f.start,end:f.end}));
+  cur.forks=(d&&d.forks)?JSON.parse(JSON.stringify(d.forks))
+           :aiNew.map(f=>({cls:f.cls,start:f.start,end:f.end,orphan:!!f.orphan}));
+  cur.orig=aiNew.map(f=>({cls:f.cls,start:f.start,end:f.end,orphan:!!f.orphan}));
+  cur.origins=(d&&d.origins)?JSON.parse(JSON.stringify(d.origins))
+             :r.origins.map(o=>({start:o.start,end:o.end}));
+  cur.oriEdited=d?!!d.ori_edited:false;
+  renderHuman(); renderAI(); renderProb(); renderChips(); updateStatus();
+}
+
+// ---- edits ----
+function newFork(cls){const c=(xr[0]+xr[1])/2*1000;
+  cur.forks.push({cls,start:Math.round(c-2500),end:Math.round(c+2500),orphan:false});renderAI();renderChips();}
+function newOri(){const c=(xr[0]+xr[1])/2*1000;
+  cur.origins.push({start:Math.round(c-750),end:Math.round(c+750)});cur.oriEdited=true;renderAI();renderChips();}
+function rmLast(){cur.forks.pop();renderAI();renderChips();}
+
+function decide(kind){
+  const r=read();
+  const base={read_id:r.read_id,annotator:ANNOT,chrom:r.chrom,
+    origins:cur.origins,ori_edited:!!cur.oriEdited};
+  if(kind==="reject") dec[r.read_id]={...base,decision:"reject",forks:[]};
+  else if(kind==="modify") dec[r.read_id]={...base,decision:"modify",forks:cur.forks};
+  else dec[r.read_id]={...base,decision:"accept",forks:cur.orig};
+  saveDecision(r.read_id); next();
+}
+function updateStatus(){
+  const r=read(),d=dec[r.read_id];
+  const cl=d?({accept:"a",modify:"m",reject:"r"})[d.decision]:"p";
+  document.getElementById("binfo").textContent=` batch ${bi+1}/${NBATCHES} `;
+  document.getElementById("status").innerHTML=
+    `· read ${i+1}/${DATA.reads.length} <span class="tag ${cl}">${d?d.decision:"pending"}</span>`;
+  const c=k=>Object.values(dec).filter(x=>x.decision===k).length;
+  document.getElementById("counts").textContent=
+    `✓${c("accept")} ✎${c("modify")} ✗${c("reject")} · ${Object.keys(dec).length}/${DATA.reads.length} done`;
+}
+function next(){i<DATA.reads.length-1?(i++,render()):updateStatus();}
+function prev(){if(i>0){i--;render();}}
+
+accept.onclick=()=>decide("accept");modify.onclick=()=>decide("modify");reject.onclick=()=>decide("reject");
+newLF.onclick=()=>newFork(1);newRF.onclick=()=>newFork(2);newORI.onclick=newOri;rmLast.onclick=rmLast;
+document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
+document.onkeydown=e=>{if(document.getElementById("login").style.display==="none"){
+  const k=e.key;
+  if(k==="a")decide("accept");else if(k==="m")decide("modify");else if(k==="r")decide("reject");
+  else if(k==="ArrowRight")next();else if(k==="ArrowLeft")prev();}};
+dl.onclick=()=>{
+  const out={batch:bi,annotator:ANNOT,
+    decisions:Object.entries(dec).map(([read_id,v])=>({read_id,...v}))};
+  const b=new Blob([JSON.stringify(out,null,1)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download=`decisions_${ANNOT}_batch_${bi}.json`;a.click();
+};
+</script>

@@ -1,0 +1,151 @@
+{
+ "batch": 0,
+ "decisions": [
+  {
+   "read_id": "14849f53-cad9-4da6-b3f7-533d7edcbcaa",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 14967853,
+     "end": 14982111,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "1487e715-7231-41ea-966b-f336ce641640",
+   "decision": "accept",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 29350252,
+     "end": 29367252,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "14fe7ceb-88c5-4718-b754-469af970d99e",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 10684047,
+     "end": 10700047,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "15266894-b5a3-460e-bfe8-209753a3420f",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 14764089,
+     "end": 14802839,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "15a42ca2-63cf-4502-99e3-3e2421de3031",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 19683690,
+     "end": 19690650,
+     "orphan": false
+    }
+   ]
+  },
+  {
+   "read_id": "16c518c6-f5cd-43c7-bba7-c635d6f68187",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 2,
+     "start": 26292813,
+     "end": 26302589,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 26348839,
+     "end": 26352339,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 26360089,
+     "end": 26375839,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 26340308,
+     "end": 26352666
+    },
+    {
+     "cls": 1,
+     "start": 26352515,
+     "end": 26357515
+    }
+   ]
+  },
+  {
+   "read_id": "16f4c948-9db7-47ee-a1e1-92df6140c4a5",
+   "decision": "modify",
+   "forks": [
+    {
+     "cls": 1,
+     "start": 17473959,
+     "end": 17491959,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 17519209,
+     "end": 17530352,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 17465709,
+     "end": 17473459,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 17502959,
+     "end": 17514577,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 17512459,
+     "end": 17518959,
+     "orphan": false
+    },
+    {
+     "cls": 2,
+     "start": 17533056,
+     "end": 17545806,
+     "orphan": false
+    },
+    {
+     "cls": 1,
+     "start": 17544913,
+     "end": 17549914
+    },
+    {
+     "cls": 2,
+     "start": 17551388,
+     "end": 17565204
+    }
+   ]
+  }
+ ]
+}
