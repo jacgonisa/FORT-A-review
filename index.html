@@ -81,9 +81,10 @@
   <span><b>bottom (edit):</b></span>
   <span><span class="box2" style="background:#2ca02c;border:1.5px solid #1a6e1a"></span>origin (drag/＋)</span>
   <span><span class="sw" style="border-top-color:#1f77b4;border-top-style:dotted"></span>
-        <span class="sw" style="border-top-color:#d62728;border-top-style:dotted"></span>AI proposal</span>
-  <span><span class="sw" style="border-top-color:#1f77b4;border-top-style:solid"></span>AI agrees (view)</span>
+        <span class="sw" style="border-top-color:#d62728;border-top-style:dotted"></span>AI proposal (editable)</span>
+  <span><span class="sw" style="border-top-color:#1f77b4;border-top-style:solid"></span>human fork (editable)</span>
   <span><span class="sw" style="border-top-color:#555;border-top-style:dashed"></span>orphan</span>
+  <span style="color:#c00">✕ = remove any fork/origin</span>
 </div>
 <div id="plotH" style="width:100%;height:22vh"></div>
 <div id="plotA" style="width:100%;height:30vh"></div>
@@ -169,7 +170,7 @@ function saveDecision(rid){
   const v=dec[rid];
   const nfeat=(v.forks?v.forks.length:0)+((v.ori_edited&&v.origins)?v.origins.length:0);
   db.collection("decisions").doc(`${ANNOT}__${rid}`)
-    .set({...v,batchKey:`${ANNOT}_${curBatch}`,batch:curBatch,nfeat,ts:Date.now()})
+    .set({...v,batchKey:`${ANNOT}_${curBatch}`,batch:curBatch,nfeat,ver:2,ts:Date.now()})
     .catch(e=>console.warn("cloud save failed",e));
 }
 // load the batch file that contains global read index gi (transparent to the user)
@@ -231,9 +232,8 @@ function renderHuman(){
 function renderAI(){
   const r=read(),as=[]; cur.aiIdx=[]; cur.oriIdx=[];
   cur.origins.forEach(o=>{cur.oriIdx.push(as.length);band(as,o.start,o.end,ORI,true,"solid");});
-  (cur.match||[]).forEach(f=>band(as,f.start,f.end,COL[f.cls],false,"solid"));
   cur.forks.forEach(f=>{cur.aiIdx.push(as.length);
-    band(as,f.start,f.end,COL[f.cls],true,f.orphan?"dashdot":"dot");});
+    band(as,f.start,f.end,COL[f.cls],true,f.human?"solid":(f.orphan?"dashdot":"dot"));});
   Plotly.react("plotA",[sigTrace(r)],{margin:{t:20,r:8,b:8,l:44},
     yaxis:{range:[0,ymax],title:"BrdU"},xaxis:{range:xr,showticklabels:false},shapes:as,
     showlegend:false,title:{text:`EDIT — origins (green) + forks · proposals ${cur.forks.length}`,
@@ -286,11 +286,12 @@ function render(){
   const r=read();
   xr=[Math.min(...r.x),Math.max(...r.x)]; ymax=Math.max(1,...r.signal)*1.1;
   const d=dec[r.read_id];
-  const aiNew=r.ai_forks.filter(f=>f.new!==false);
-  cur.match=r.ai_forks.filter(f=>f.new===false).map(f=>({cls:f.cls,start:f.start,end:f.end}));
-  cur.forks=(d&&d.forks)?JSON.parse(JSON.stringify(d.forks))
-           :aiNew.map(f=>({cls:f.cls,start:f.start,end:f.end,orphan:!!f.orphan}));
-  cur.orig=aiNew.map(f=>({cls:f.cls,start:f.start,end:f.end,orphan:!!f.orphan}));
+  // every fork is editable/removable now: matched-human forks first, then AI proposals
+  const dflt=r.ai_forks.map(f=>({cls:f.cls,start:f.start,end:f.end,
+                                 orphan:!!f.orphan, human:f.new===false}));
+  cur.match=[];
+  cur.forks=(d&&d.forks)?JSON.parse(JSON.stringify(d.forks)):JSON.parse(JSON.stringify(dflt));
+  cur.orig=JSON.parse(JSON.stringify(dflt));
   cur.origins=(d&&d.origins)?JSON.parse(JSON.stringify(d.origins))
              :r.origins.map(o=>({start:o.start,end:o.end}));
   cur.oriEdited=d?!!d.ori_edited:false;
