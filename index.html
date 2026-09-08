@@ -57,6 +57,7 @@
 <div id="app">
 <div id="bar">
   <span id="who"></span>
+  <span id="region"></span>
   <span id="status"></span><span id="counts"></span>
   <button id="jumpNext">↧ next unreviewed</button>
   <button id="dl">⬇ backup my decisions</button>
@@ -93,6 +94,19 @@
 
 <script>
 const COL={1:"#1f77b4",2:"#d62728"}, ORI="#2ca02c";
+// genomic region of a read (TAIR-coords, Mb) — shown as a badge for context
+const CEN={Chr1:[14.853761,17.129892],Chr2:[9.388656,11.655818],Chr3:[13.593457,15.740665],
+           Chr4:[8.384369,11.037620],Chr5:[12.371485,15.175824]};
+const PERI={Chr1:[[12.304862,14.853761],[17.129892,19.920576]],Chr2:[[5.428773,9.324714],[11.655894,15.743439]],
+            Chr3:[[9.077126,13.593457],[15.740665,20.137994]],Chr4:[[6.755262,8.384369],[11.037620,13.328723]],
+            Chr5:[[9.112077,12.371485],[15.175824,18.882439]]};
+const REGCOL={Arm:"#457b9d",Pericentromere:"#f4a261",Centromere:"#e63946"};
+function readRegion(ch,midMb){
+  const c=CEN[ch]; if(!c) return "?";
+  if(midMb>=c[0]&&midMb<=c[1]) return "Centromere";
+  if((PERI[ch]||[]).some(p=>midMb>=p[0]&&midMb<=p[1])) return "Pericentromere";
+  return "Arm";
+}
 let ASSIGN=null, ANNOT=null, TOTAL=0, gi=0, curBatch=-1; const SIZE=50;
 let DATA=null, dec={}, bound=false;
 let cur={forks:[],aiIdx:[],orig:[],match:[],origins:[],oriIdx:[],oriEdited:false};
@@ -285,6 +299,11 @@ function renderChips(){
 function render(){
   const r=read();
   xr=[Math.min(...r.x),Math.max(...r.x)]; ymax=Math.max(1,...r.signal)*1.1;
+  const reg=readRegion(r.chrom,(xr[0]+xr[1])/2/1000);
+  const rb=document.getElementById("region");
+  rb.textContent=`${r.chrom} · ${reg}`;
+  rb.style.cssText=`padding:2px 9px;border-radius:10px;font-size:12px;font-weight:600;`
+    +`color:#fff;background:${REGCOL[reg]||"#999"}`;
   const d=dec[r.read_id];
   // every fork is editable/removable now: matched-human forks first, then AI proposals
   const dflt=r.ai_forks.map(f=>({cls:f.cls,start:f.start,end:f.end,
