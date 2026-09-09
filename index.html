@@ -60,6 +60,8 @@
   <span id="region"></span>
   <span id="status"></span><span id="counts"></span>
   <button id="jumpNext">↧ next unreviewed</button>
+  <input id="jb" type="number" min="1" style="width:52px" title="batch #">
+  <button id="jbGo">go to batch</button>
   <button id="dl">⬇ backup my decisions</button>
   <button id="logout">logout</button>
 </div>
@@ -221,6 +223,7 @@ async function jumpNext(){
   await goto(g);
 }
 document.getElementById("jumpNext").onclick=jumpNext;
+document.getElementById("jbGo").onclick=async()=>{const b=parseInt(document.getElementById("jb").value)-1; if(b>=0) await goto(b*SIZE);};
 
 // ---- drawing ----
 const read=()=>DATA.reads[gi-curBatch*SIZE];
