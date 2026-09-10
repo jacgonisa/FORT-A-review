@@ -243,7 +243,9 @@ function renderHuman(){
   r.human_forks.forEach(f=>band(hs,f.start,f.end,COL[clsOf(f.kind)],false));
   Plotly.react("plotH",[sigTrace(r)],{margin:{t:20,r:8,b:8,l:44},
     yaxis:{range:[0,ymax],title:"BrdU"},xaxis:{range:xr,showticklabels:false},shapes:hs,
-    showlegend:false,title:{text:`HUMAN — ${r.origins.length} ori / ${r.human_forks.length} fork`,
+    showlegend:false,title:{text:r.reassess
+        ?`AI-PROPOSED — ${r.origins.length} ori (model predictions — confirm/reject below)`
+        :`HUMAN — ${r.origins.length} ori / ${r.human_forks.length} fork`,
       font:{size:12},x:0.01,xanchor:"left"}},{staticPlot:true,displayModeBar:false});
 }
 function renderAI(){
