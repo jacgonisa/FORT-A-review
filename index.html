@@ -74,7 +74,9 @@
   <span style="color:#888;font-size:12px">| add:</span>
   <button id="newLF">＋LF</button><button id="newRF">＋RF</button>
   <button id="newORI">＋origin</button><button id="rmLast">－remove last fork</button>
+  <button id="mergeT" title="merge same-class forks/origins that touch — fixes over-segmented tracts">⤨ merge touching</button>
 </div>
+<div style="font-size:11px;color:#888;margin:-2px 0 2px">tip: drag a fork/origin edge to adjust its boundary · ⤨ merges touching same-class tracts</div>
 <div id="feats" style="font-size:12px;margin:2px 0"></div>
 <div id="legend">
   <span><b>top human:</b></span>
@@ -328,6 +330,28 @@ function newFork(cls){const c=(xr[0]+xr[1])/2*1000;
 function newOri(){const c=(xr[0]+xr[1])/2*1000;
   cur.origins.push({start:Math.round(c-750),end:Math.round(c+750)});cur.oriEdited=true;renderAI();renderChips();}
 function rmLast(){cur.forks.pop();renderAI();renderChips();}
+// merge same-class events (forks by cls, origins) that touch / are within GAP -> one span
+function mergeTouching(){
+  const GAP=800;
+  const collapse=(list,byCls)=>{
+    const groups={}; list.forEach(e=>{const k=byCls?e.cls:0;(groups[k]=groups[k]||[]).push(e);});
+    const out=[];
+    Object.values(groups).forEach(g=>{
+      g.sort((a,b)=>a.start-b.start); let c=null;
+      g.forEach(e=>{
+        if(c && e.start<=c.end+GAP){c.start=Math.min(c.start,e.start);c.end=Math.max(c.end,e.end);}
+        else{c={...e};out.push(c);}
+      });
+    });
+    return out;
+  };
+  const before=cur.forks.length+cur.origins.length;
+  cur.forks=collapse(cur.forks,true);
+  cur.origins=collapse(cur.origins,false); cur.oriEdited=true;
+  const merged=before-(cur.forks.length+cur.origins.length);
+  renderAI();renderChips();
+  if(!merged) alert("nothing to merge (no touching same-class tracts)");
+}
 
 function decide(kind){
   const r=read();
@@ -352,6 +376,7 @@ async function prev(){ if(gi>0) await goto(gi-1); }
 
 accept.onclick=()=>decide("accept");modify.onclick=()=>decide("modify");reject.onclick=()=>decide("reject");
 newLF.onclick=()=>newFork(1);newRF.onclick=()=>newFork(2);newORI.onclick=newOri;rmLast.onclick=rmLast;
+mergeT.onclick=mergeTouching;
 document.getElementById("next").onclick=next;document.getElementById("prev").onclick=prev;
 document.onkeydown=e=>{if(document.getElementById("login").style.display==="none"){
   const k=e.key;
