@@ -294,7 +294,8 @@ function renderAI(){
     band(as,f.start,f.end,COL[f.cls],true,f.human?"solid":(f.orphan?"dashdot":"dot"));});
   Plotly.react("plotA",[sigTrace(r)],{margin:{t:20,r:8,b:8,l:44},
     yaxis:{range:[0,ymax],title:"BrdU"},xaxis:{range:xr,showticklabels:false},shapes:as,
-    showlegend:false,title:{text:`EDIT — origins (green) + forks · proposals ${cur.forks.length}`,
+    showlegend:false,title:{text:`${r.carrington?"FORK-H":"AI"} prediction — ✎ EDIT here · `
+        +`${cur.forks.length} fork${cur.forks.length===1?"":"s"} / ${cur.origins.length} ori (green)`,
       font:{size:12},x:0.01,xanchor:"left"}},
     {editable:false,edits:{shapePosition:true},displayModeBar:false});
   if(!bound){bound=true;
