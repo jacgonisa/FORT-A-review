@@ -7,11 +7,11 @@
 <script src="config.js" onerror="window.__noconfig=1"></script>
 <style>
   body{font:14px/1.4 system-ui,sans-serif;margin:0;padding:8px 16px;color:#222}
-  #login{position:fixed;inset:0;background:#f4f4f4;display:flex;align-items:center;
+  #login,#chooser{position:fixed;inset:0;background:#f4f4f4;display:flex;align-items:center;
     justify-content:center;z-index:10}
-  #login .box{background:#fff;padding:28px 32px;border:1px solid #ccc;border-radius:10px;
-    box-shadow:0 4px 18px #0002;min-width:280px}
-  #login h2{margin:0 0 4px}#login p{color:#666;margin:0 0 16px;font-size:13px}
+  #login .box,#chooser .box{background:#fff;padding:28px 32px;border:1px solid #ccc;border-radius:10px;
+    box-shadow:0 4px 18px #0002;min-width:280px;text-align:center}
+  #login h2,#chooser h2{margin:0 0 4px}#login p{color:#666;margin:0 0 16px;font-size:13px}
   #login input{display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:8px;
     border:1px solid #bbb;border-radius:6px;font-size:14px}
   #login button{width:100%;margin-top:10px;padding:9px;font-size:14px;background:#1a6e1a;
@@ -39,10 +39,27 @@
   #legend span{display:inline-flex;align-items:center;gap:5px}
   .sw{display:inline-block;width:22px;height:0;border-top-width:3px;border-top-style:solid}
   .box2{display:inline-block;width:13px;height:11px;opacity:.4;border-radius:2px}
+  .dscard{width:150px;padding:20px 12px;border:2px solid #ddd;border-radius:12px;background:#fafafa;
+          cursor:pointer;transition:all .12s;text-align:center;font-size:15px;color:#222}
+  .dscard:hover{border-color:#1a6e1a;background:#f0f7f0;transform:translateY(-2px)}
 </style>
 
-<div id="login"><div class="box">
-  <h2>FORT-A review</h2>
+<div id="chooser"><div class="box">
+  <h2>What are you annotating?</h2>
+  <p style="color:#666">Pick your dataset.</p>
+  <div style="display:flex;gap:18px;justify-content:center;margin-top:14px">
+    <button class="dscard" data-ds="arabidopsis">
+      <div style="font-size:52px;line-height:1">🍃</div><div style="margin-top:6px;font-weight:600">Arabidopsis</div>
+      <div style="font-size:11px;color:#888">FORT-A · Nerea reference</div></button>
+    <button class="dscard" data-ds="mouse">
+      <div style="font-size:52px;line-height:1">🐭</div><div style="margin-top:6px;font-weight:600">Mouse</div>
+      <div style="font-size:11px;color:#888">Fork-H · Carrington reference</div></button>
+  </div>
+</div></div>
+
+<div id="login" style="display:none"><div class="box">
+  <h2 id="loginTitle">FORT-A review</h2>
+  <p><a href="#" id="backChooser" style="font-size:12px;color:#888">← change dataset</a></p>
   <p>Enter the username and password you were given.</p>
   <input id="u" placeholder="username" autocomplete="off">
   <input id="p" type="password" placeholder="password" autocomplete="off">
@@ -145,7 +162,7 @@ async function showProgress(){
   if(!CLOUD){ box.innerHTML="<i style='color:#999'>progress shown once cloud is configured</i>"; return; }
   box.innerHTML="<i style='color:#999'>loading progress…</i>";
   let rows="", tDone=0, tTot=0, tFeat=0;
-  for(const a of Object.keys(ASSIGN)){
+  for(const a of Object.keys(ASSIGN).filter(x=>!DATASET||dsOf(x)===DATASET)){
     const tot=ASSIGN[a].reads, st=await annotStats(a);
     const done=st.reads, left=done==null?"?":Math.max(0,tot-done);
     const pct=done==null?0:Math.min(100,100*done/tot);
@@ -161,12 +178,25 @@ async function showProgress(){
       +`<th>features</th><th></th></tr>${rows}</table>`;
 }
 
-// ---- login ----
-fetch("data/assignments.json").then(r=>r.json()).then(a=>{ASSIGN=a; showProgress();})
+// ---- dataset chooser + login ----
+let DATASET=null;
+const dsOf=a=>(ASSIGN&&ASSIGN[a]&&ASSIGN[a].dataset)||"arabidopsis";
+fetch("data/assignments.json").then(r=>r.json()).then(a=>{ASSIGN=a;})
   .catch(()=>document.getElementById("lerr").textContent="assignments.json not found");
+document.querySelectorAll(".dscard").forEach(c=>c.onclick=()=>{
+  DATASET=c.dataset.ds;
+  document.getElementById("chooser").style.display="none";
+  document.getElementById("login").style.display="flex";
+  document.getElementById("loginTitle").textContent=DATASET==="mouse"?"Fork-H review (mouse) 🐭":"FORT-A review (Arabidopsis) 🍃";
+  showProgress();
+});
+document.getElementById("backChooser").onclick=e=>{e.preventDefault();
+  document.getElementById("login").style.display="none";
+  document.getElementById("chooser").style.display="flex"; DATASET=null;};
 function tryLogin(){
   const u=document.getElementById("u").value.trim(), p=document.getElementById("p").value.trim();
   if(!ASSIGN||!(u in ASSIGN)){document.getElementById("lerr").textContent="unknown annotator";return;}
+  if(dsOf(u)!==DATASET){document.getElementById("lerr").textContent="that annotator isn't in this dataset";return;}
   if(p!==u){document.getElementById("lerr").textContent="incorrect password";return;}
   ANNOT=u; TOTAL=ASSIGN[u].reads;
   document.getElementById("login").style.display="none";
@@ -241,14 +271,21 @@ let xr=[0,1], ymax=1;
 
 function renderHuman(){
   const r=read(),hs=[];
-  r.origins.forEach(o=>band(hs,o.start,o.end,ORI,false));
-  r.human_forks.forEach(f=>band(hs,f.start,f.end,COL[clsOf(f.kind)],false));
+  // mouse reads carry a Carrington reference (forks+origins); Arabidopsis uses r.origins + human_forks
+  const isMouse=!!r.carrington;
+  const refOri = isMouse ? r.carrington.origins : r.origins;
+  const refForks = isMouse ? r.carrington.forks : r.human_forks;
+  refOri.forEach(o=>band(hs,o.start,o.end,ORI,false));
+  refForks.forEach(f=>band(hs,f.start,f.end,COL[clsOf(f.kind)],false));
+  const title = isMouse
+      ? `CARRINGTON (reference) — ${r.carrington.origins.length} ori / ${r.carrington.forks.length} fork`
+      : (r.reassess
+          ? `AI-PROPOSED — ${r.origins.length} ori (model predictions — confirm/reject below)`
+          : `HUMAN — ${r.origins.length} ori / ${r.human_forks.length} fork`);
   Plotly.react("plotH",[sigTrace(r)],{margin:{t:20,r:8,b:8,l:44},
     yaxis:{range:[0,ymax],title:"BrdU"},xaxis:{range:xr,showticklabels:false},shapes:hs,
-    showlegend:false,title:{text:r.reassess
-        ?`AI-PROPOSED — ${r.origins.length} ori (model predictions — confirm/reject below)`
-        :`HUMAN — ${r.origins.length} ori / ${r.human_forks.length} fork`,
-      font:{size:12},x:0.01,xanchor:"left"}},{staticPlot:true,displayModeBar:false});
+    showlegend:false,title:{text:title,font:{size:12},x:0.01,xanchor:"left"}},
+    {staticPlot:true,displayModeBar:false});
 }
 function renderAI(){
   const r=read(),as=[]; cur.aiIdx=[]; cur.oriIdx=[];
