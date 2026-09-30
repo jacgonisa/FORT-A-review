@@ -57,6 +57,9 @@
     <button class="dscard" data-ds="human">
       <div style="font-size:52px;line-height:1">💃</div><div style="margin-top:6px;font-weight:600">Human</div>
       <div style="font-size:11px;color:#888">FORT-A v1.2 · caller reference</div></button>
+    <button class="dscard" data-ds="arablong">
+      <div style="font-size:52px;line-height:1">🦒</div><div style="margin-top:6px;font-weight:600">Long reads</div>
+      <div style="font-size:11px;color:#888">Arabidopsis &gt;200 kb · FORT-A tiled + human ref</div></button>
   </div>
 </div></div>
 
@@ -192,7 +195,7 @@ document.querySelectorAll(".dscard").forEach(c=>c.onclick=()=>{
   DATASET=c.dataset.ds;
   document.getElementById("chooser").style.display="none";
   document.getElementById("login").style.display="flex";
-  document.getElementById("loginTitle").textContent=DATASET==="mouse"?"Fork-H review (mouse) 🐭":(DATASET==="human"?"FORT-A v1.2 review (human) 💃":"FORT-A review (Arabidopsis) 🍃");
+  document.getElementById("loginTitle").textContent=DATASET==="mouse"?"Fork-H review (mouse) 🐭":(DATASET==="human"?"FORT-A v1.2 review (human) 💃":(DATASET==="arablong"?"FORT-A long-read review (>200 kb) 🦒":"FORT-A review (Arabidopsis) 🍃"));
   showProgress();
 });
 document.getElementById("backChooser").onclick=e=>{e.preventDefault();
@@ -279,13 +282,14 @@ function renderHuman(){
   // mouse reads carry a Carrington reference (forks+origins); Arabidopsis uses r.origins + human_forks;
   // human reads carry r.human_ref (current caller annotation) as the reference track.
   const isMouse=!!r.carrington;
-  const isHuman=r.dataset==="human";
-  const refOri = isHuman ? r.human_ref.origins : (isMouse ? r.carrington.origins : r.origins);
-  const refForks = isHuman ? r.human_ref.forks : (isMouse ? r.carrington.forks : r.human_forks);
+  const useRef=r.dataset==="human"||r.dataset==="arablong";   // both show r.human_ref as reference
+  const isArabLong=r.dataset==="arablong";
+  const refOri = useRef ? r.human_ref.origins : (isMouse ? r.carrington.origins : r.origins);
+  const refForks = useRef ? r.human_ref.forks : (isMouse ? r.carrington.forks : r.human_forks);
   refOri.forEach(o=>band(hs,o.start,o.end,ORI,false));
   refForks.forEach(f=>band(hs,f.start,f.end,COL[clsOf(f.kind)],false));
-  const title = isHuman
-      ? `CURRENT CALLER (reference) — ${r.human_ref.origins.length} ori / ${r.human_ref.forks.length} fork`
+  const title = useRef
+      ? `${isArabLong?(r.human_ref.origins.length+r.human_ref.forks.length?"HUMAN annotation":"NO human annotation"):"CURRENT CALLER"} (reference) — ${r.human_ref.origins.length} ori / ${r.human_ref.forks.length} fork`
       : (isMouse
       ? `CARRINGTON (reference) — ${r.carrington.origins.length} ori / ${r.carrington.forks.length} fork`
       : (r.reassess
@@ -303,7 +307,7 @@ function renderAI(){
     band(as,f.start,f.end,COL[f.cls],true,f.human?"solid":(f.orphan?"dashdot":"dot"));});
   Plotly.react("plotA",[sigTrace(r)],{margin:{t:20,r:8,b:8,l:44},
     yaxis:{range:[0,ymax],title:"BrdU"},xaxis:{range:xr,showticklabels:false},shapes:as,
-    showlegend:false,title:{text:`${r.dataset==="human"?"FORT-A v1.2":(r.carrington?"FORK-H":"AI")} prediction — ✎ EDIT here · `
+    showlegend:false,title:{text:`${r.dataset==="human"?"FORT-A v1.2":(r.dataset==="arablong"?"FORT-A v1.2 (tiled)":(r.carrington?"FORK-H":"AI"))} prediction — ✎ EDIT here · `
         +`${cur.forks.length} fork${cur.forks.length===1?"":"s"} / ${cur.origins.length} ori (green)`,
       font:{size:12},x:0.01,xanchor:"left"}},
     {editable:false,edits:{shapePosition:true},displayModeBar:false});
