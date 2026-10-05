@@ -27,7 +27,7 @@ calls in the browser). For a fresh session: read this first.
 |---|---|---|---|
 | 🍃 arabidopsis | annotator1–8 | Nerea human labels | forta_v2 proposals |
 | 🐭 mouse | mouse1, mouse2 | Carrington caller | Fork-H (+ FORT-A v1.2 ref) |
-| 🐭 mouse | **mousemut1** (CG_MG_KO mutant) | none | **FORT-M** |
+| 🐭 mouse | **mousemut1** (CG_MG_KO mutant) | Carrington caller | Fork-H (+ FORT-A v1.2 ref) |
 | 💃 human | human1, human2 | HeLa caller | FORT-A v1.2 |
 | 🦒 arablong (>200 kb) | arablong1 | human trusted labels | FORT-A v1.2 (tiled) |
 
@@ -53,7 +53,26 @@ Decision doc id = `<annotator>__<read_id>`; `cls` 1=left_fork, 2=right_fork. Col
    - `make_mouse_batches.py` (mouse) · `make_mouse_mutant_batches.py` (mouse mutant) ·
      `make_human_batches.py` (human) · `make_arablong_batches.py` (Arabidopsis >200 kb).
    - Each: model prediction (tiling for any length) → editable AI; reference from the caller/human labels.
-   - Most need a FORT-A prediction dumped first (`dump_forta_mouse.py` / `dump_forta_human.py`).
+   - Most need a FORT-A prediction dumped first (`dump_forta_mouse.py` / `dump_forta_mutant.py` /
+     `dump_forta_human.py`).
+
+### Mouse mutant (mousemut1) — IDENTICAL layout to mouse1/mouse2
+mousemut1 shows the **same three tracks** as mouse1/2: **Carrington** reference + **Fork-H**
+(`forth_scratch.keras`) editable AI + **FORT-A v1.2** reference overlay/softmax. (It previously showed
+only a single FORT-M editable track with an empty reference — fixed 2026-10.) Full rebuild from the
+mutant DNAscent `detect.mod` modBAM (`mouse/mutant/…detect.mod…sorted.bam`):
+```bash
+cd /mnt/ssd-4tb/crisanto_project/FORT-A && conda activate ONT
+python scripts/mutant_modbam_to_detect.py          # modBAM → mouse/mutant_detect_csplit/xxNNNNN (detect text)
+python scripts/run_carrington_mutant.py            # Carrington TVRND R caller → mouse/carrington_mutant/*.bed
+CUDA_VISIBLE_DEVICES=-1 python scripts/dump_forta_mutant.py        # FORT-A v1.2 → mouse/forta_pred_mutant.json
+CUDA_VISIBLE_DEVICES=-1 python scripts/make_mouse_mutant_batches.py # Fork-H editable + both refs → batches
+```
+**Carrington needs the R package `tvdiff`** (natbprice/tvdiff, GitHub-only, not CRAN):
+`R -e 'remotes::install_github("natbprice/tvdiff")'`. The caller params match the paper (window 290,
+step 290, BrdU prob 0.5, gradient 1). The modBAM→detect converter extracts per-thymidine BrdU from mod
+key `('T',strand,'T')` and writes `>readID contig start end fwd|rev` + `refpos⇥prob⇥6mer` rows;
+`list.files(pattern='xx')[-1]` drops the dummy `xx00000` global-header file.
 2. **New dataset card** (if not reusing an existing one): add a `<button class="dscard" data-ds="…">` in
    `index.html`, a `loginTitle` case, and a render branch (copy the human/arablong `r.human_ref` pattern).
 3. **Deploy:** commit `index.html` + `data/<annotator>/` + `data/assignments.json`, then
@@ -72,6 +91,8 @@ Decision doc id = `<annotator>__<read_id>`; `cls` 1=left_fork, 2=right_fork. Col
 
 ## Current status / TODO
 - mouse1/mouse2: 1,202 reviewed (957 curated events, pulled to `FORT-A/mouse/labels/`).
-- mousemut1: 1,599 reads live, awaiting annotation.
+- mousemut1: 1,599 reads; rebuilt 2026-10 to match mouse1/2 (Carrington ref + Fork-H editable +
+  FORT-A v1.2 ref). Any annotations made against the old single-track (FORT-M) build should be
+  re-checked, since the editable track changed from FORT-M to Fork-H.
 - arablong1: 431 reads, ~30% reviewed last pull.
 - human1/human2, annotator1–8: see assignments.json for sizes.
